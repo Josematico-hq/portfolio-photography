@@ -1,10 +1,9 @@
 ---
 // components/Header.astro
-import logo from '../images/logo.png';
+
 ---
-<header class="flex justify-between items-center p-4">
-    <!-- <img src={logo.src} alt="Logo" class="h-14"> -->
-     <h1><span class="font-bold text-gray-400">JOSE</span><span class="font-bold ">MATICO.</span></h1>
-    <span class="text-sm tracking-widest uppercase ">Photography</span>
-    <a href="mailto:hello@josematico.com" class="text-sm tracking-widest uppercase ">hello@josematico.com</a>
-  </header>
+<header class="grid grid-cols-3 items-center py-4">
+    <h1><a href="http://josematico.com"><span class="font-bold text-gray-400">JOSE</span><span class="font-bold">MATICO.</span></a> </h1>
+    <span class="text-sm tracking-widest uppercase text-center">Photography</span>
+    <a href="mailto:hello@josematico.com" class="text-sm tracking-widest uppercase text-right">hello@josematico.com</a>
+</header>

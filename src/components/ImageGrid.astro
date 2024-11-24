@@ -1,10 +1,12 @@
 ---
+import InfiniteScroll from './InfiniteScroll.astro';
+
 const instagramToken = import.meta.env.PUBLIC_INSTAGRAM_ACCESS_TOKEN;
 const instagramUserId = import.meta.env.PUBLIC_INSTAGRAM_USER_ID;
 
-// Función para obtener las publicaciones de Instagram
-const fetchInstagramPosts = async () => {
-  const url = `https://graph.instagram.com/${instagramUserId}/media?fields=id,caption,media_type,media_url,permalink,timestamp&access_token=${instagramToken}`;
+// Función para obtener las publicaciones iniciales de Instagram
+const fetchInitialPosts = async () => {
+  const url = `https://graph.instagram.com/${instagramUserId}/media?fields=id,caption,media_type,media_url,permalink,timestamp&access_token=${instagramToken}&limit=12`;
 
   try {
     const response = await fetch(url);
@@ -16,25 +18,15 @@ const fetchInstagramPosts = async () => {
   }
 };
 
-// Llamada a la API para obtener las publicaciones
-const posts = await fetchInstagramPosts();
+const initialPosts = await fetchInitialPosts();
 ---
 
-<div class="columns-1 sm:columns-2 md:columns-3 gap-4">
-  {posts.error ? (
-    <div class="error-message">Error al obtener las publicaciones: {posts.error}</div>
-  ) : (
-    posts.map((post) => (
-      <div class="break-inside-avoid mb-4">
-        <a href={post.permalink} target="_blank" rel="noopener noreferrer">
-          <img 
-            src={post.media_url} 
-            alt={post.caption || 'Instagram Post'} 
-            class="w-full rounded-lg"
-            loading="lazy"
-          />
-        </a>
-      </div>
-    ))
-  )}
-</div>
+{initialPosts.error ? (
+  <div class="error-message">Error al obtener las publicaciones: {initialPosts.error}</div>
+) : (
+  <InfiniteScroll 
+    initialPosts={initialPosts} 
+    userId={instagramUserId} 
+    accessToken={instagramToken}
+  />
+)}
