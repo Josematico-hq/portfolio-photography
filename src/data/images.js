@@ -1,4 +1,3 @@
-// src/data/images.js
 import image1 from '../images/IMG_1532.jpg';
 import image2 from '../images/EDA7CA04-D8D7-42EC-B28A-FDEA5B01CD75-1220-000000CBA1A07FA2.jpg';
 import image3 from '../images/IMG_1150.jpg';

@@ -1,19 +1,15 @@
 ---
 import InfiniteScroll from './InfiniteScroll.astro';
 
-const instagramToken = import.meta.env.PUBLIC_INSTAGRAM_ACCESS_TOKEN;
-const instagramUserId = import.meta.env.PUBLIC_INSTAGRAM_USER_ID;
-
-// Función para obtener las publicaciones iniciales de Instagram
 const fetchInitialPosts = async () => {
-  const url = `https://graph.instagram.com/${instagramUserId}/media?fields=id,caption,media_type,media_url,permalink,timestamp&access_token=${instagramToken}&limit=12`;
-
   try {
-    const response = await fetch(url);
+    const baseUrl = import.meta.env.SITE ?? 'http://localhost:4321';
+    const response = await fetch(`${baseUrl}/api/instagram`);
     if (!response.ok) throw new Error('Error al obtener publicaciones');
     const data = await response.json();
     return data.data;
   } catch (error) {
+    console.error('Error detallado:', error);
     return { error: error.message };
   }
 };
@@ -24,9 +20,5 @@ const initialPosts = await fetchInitialPosts();
 {initialPosts.error ? (
   <div class="error-message">Error al obtener las publicaciones: {initialPosts.error}</div>
 ) : (
-  <InfiniteScroll 
-    initialPosts={initialPosts} 
-    userId={instagramUserId} 
-    accessToken={instagramToken}
-  />
+  <InfiniteScroll initialPosts={initialPosts} />
 )}

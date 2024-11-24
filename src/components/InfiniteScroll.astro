@@ -1,11 +1,9 @@
 ---
 interface Props {
   initialPosts: any[];
-  userId: string;
-  accessToken: string;
 }
 
-const { initialPosts, userId, accessToken } = Astro.props;
+const { initialPosts } = Astro.props;
 ---
 
 <div class="columns-1 sm:columns-2 md:columns-3 gap-4" id="posts-container">
@@ -24,20 +22,23 @@ const { initialPosts, userId, accessToken } = Astro.props;
 </div>
 <div id="scroll-trigger" class="h-10"></div>
 
-<script define:vars={{ userId, accessToken }}>
-  let nextPageUrl = null;
+<script>
+  let nextCursor = null;
   let isLoading = false;
 
   const postsContainer = document.getElementById('posts-container');
   const scrollTrigger = document.getElementById('scroll-trigger');
 
-  async function fetchMorePosts(url) {
+  const baseUrl = import.meta.env.SITE ?? 'http://localhost:4321';
+
+  async function fetchMorePosts() {
     try {
+      const url = `${baseUrl}/api/instagram${nextCursor ? `?after=${nextCursor}` : ''}`;
       const response = await fetch(url);
       if (!response.ok) throw new Error('Error fetching posts');
       const data = await response.json();
       
-      nextPageUrl = data.paging?.next || null;
+      nextCursor = data.paging?.cursors?.after || null;
       return data.data;
     } catch (error) {
       console.error('Error:', error);
@@ -63,10 +64,10 @@ const { initialPosts, userId, accessToken } = Astro.props;
   const observer = new IntersectionObserver(async (entries) => {
     const trigger = entries[0];
     
-    if (trigger.isIntersecting && !isLoading && nextPageUrl) {
+    if (trigger.isIntersecting && !isLoading && nextCursor) {
       isLoading = true;
       
-      const newPosts = await fetchMorePosts(nextPageUrl);
+      const newPosts = await fetchMorePosts();
       
       if (newPosts.length > 0) {
         const postsHTML = newPosts.map(createPostElement).join('');
@@ -76,14 +77,10 @@ const { initialPosts, userId, accessToken } = Astro.props;
       isLoading = false;
     }
   }, {
-    rootMargin: '200px' // Empezar a cargar cuando estemos a 200px del trigger
+    rootMargin: '200px'
   });
 
-  // Inicializar el observer
   if (scrollTrigger) {
     observer.observe(scrollTrigger);
   }
-
-  // Establecer la URL inicial para la siguiente página
-  nextPageUrl = `https://graph.instagram.com/${userId}/media?fields=id,caption,media_type,media_url,permalink,timestamp&access_token=${accessToken}&limit=12`;
 </script> 
